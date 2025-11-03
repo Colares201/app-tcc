@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_database: ^12.0.3
   firebase_core: ^4.2.0
+  firebase_auth: ^6.1.1
   ntp: ^2.0.0
   fl_chart: ^1.1.1 # Pacote de gráficos
   intl: ^0.20.2 # Para formatar a data no gráfico # Para formatar a data no gráfico

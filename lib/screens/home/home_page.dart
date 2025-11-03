@@ -7,6 +7,7 @@ import 'package:untitled1/firebase_options.dart';
 import 'package:untitled1/main.dart';
 import 'package:ntp/ntp.dart'; // Importa o pacote NTP
 import 'package:untitled1/screens/power_chart/power_chart.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 
@@ -127,6 +128,15 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(builder: (context) => const PowerChartPage()),
                 );
+              },
+            ),
+            // NOVO ITEM: LOGOUT
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Sair (Logout)'),
+              onTap: () async {
+                Navigator.pop(context); // Fecha o drawer
+                await FirebaseAuth.instance.signOut(); // <--- CHAMA O LOGOUT DO FIREBASE
               },
             ),
           ],
