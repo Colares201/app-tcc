@@ -22,8 +22,12 @@ class PowerChartPage extends StatelessWidget {
           if (snapshot.hasError) {
             return Center(child: Text('Erro: ${snapshot.error}'));
           }
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
+          // Se não há dados no snapshot, ou o valor da snapshot é nulo, mostrar mensagem de erro
+          if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+              return const Center(child: Text('Nenhum dado de potência disponível.'));
           }
           
           final data = snapshot.data!.snapshot.value;
@@ -35,7 +39,7 @@ class PowerChartPage extends StatelessWidget {
               if (value is Map && value.containsKey('timestamp') && value.containsKey('value')) {
                 try {
                   final timestamp = value['timestamp'] as int;
-                  final powerValue = (value['value'] as num).toDouble();
+                  final powerValue = (value['value'] as num).toDouble()/1000.0;
                   chartData.add(
                     PowerData(
                       DateTime.fromMillisecondsSinceEpoch(timestamp),
@@ -65,34 +69,49 @@ class PowerChartPage extends StatelessWidget {
                 minX: displayData.first.time.millisecondsSinceEpoch.toDouble(),
                 maxX: displayData.last.time.millisecondsSinceEpoch.toDouble(),
                 minY: 0, 
-                maxY: displayData.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.1, // 10% a mais do valor máximo
+                maxY: 0.9,//displayData.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.1, // 10% a mais do valor máximo
                 titlesData: FlTitlesData(
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   leftTitles: AxisTitles(
-                    axisNameWidget: const Text('Potência (W)'),
+                    axisNameWidget: const Text('Potência (kW)'),
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 40,
-                      interval: 50, // Ajuste o intervalo conforme a escala da sua potência
+                      reservedSize: 18,
+                      interval: 0.1,
+                      // NOVO: Adicionar formatação clara
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          // Formata para 2 casas decimais (ex: 0.50)
+                          NumberFormat('0.0').format(value), 
+                          style: const TextStyle(fontSize: 10),
+                        );
+                      },
+                      // FIM NOVO // Ajuste o intervalo conforme a escala da sua potência
                     ),
                   ),
                   bottomTitles: AxisTitles(
                     axisNameWidget: const Text('Tempo'),
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 30,
-                      interval: 60000, // Intervalo de 1 minuto em milissegundos
+                      reservedSize: 90,
+                      interval: 600000, // Intervalo de 1 minuto em milissegundos
                       getTitlesWidget: (value, meta) {
                         // Converte o timestamp para DateTime e formata para exibição
                         final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                        final formattedTime = DateFormat('HH:mm').format(date);
                         return SideTitleWidget(
-                          //axisSide: meta.axisSide,
+                          angle: -1.57, 
                           space: 8.0,
+                          //axisSide: meta.axisSide,
+                         // space: 8.0,
                           meta: meta,
                           child: Text(
-                            DateFormat('HH:mm:ss').format(date),
-                            style: const TextStyle(fontSize: 10),
+                            //DateFormat('HH:mm').format(date),
+                            formattedTime,
+                            style: const TextStyle(fontSize: 15),
+                            // Alinhamento do texto para o canto inferior direito
+                            textAlign: TextAlign.left,
                           ),
                         );
                       },

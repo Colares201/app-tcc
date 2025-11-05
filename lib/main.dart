@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart'; 
 import 'package:untitled1/screens/home/home_page.dart';
 import 'package:untitled1/screens/auth/login_page.dart'; // <--- NOVO
+import 'package:firebase_database/firebase_database.dart'; // <--- NOVO: Importar o database
 
 // PONTO DE ENTRADA
 void main() async {
@@ -13,6 +14,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // AÇÃO CHAVE: Habilitar o cache offline do Firebase
+  FirebaseDatabase.instance.setPersistenceEnabled(true);
   runApp(const LedControlApp());
 }
 
