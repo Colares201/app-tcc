@@ -1,6 +1,7 @@
+
 // lib/screens/consumption_table/consumption_table_page.dart
 
-import 'package:firebase_database/firebase_database.dart';
+/*import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/model/power_date.dart'; // Importa o modelo PowerData
 
@@ -84,4 +85,4 @@ class ConsumptionTablePage extends StatelessWidget {
       ),
     );
   }
-}
+}*/

@@ -3,10 +3,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart'; // Usado para Material App e widgets
 import 'package:firebase_core/firebase_core.dart';
-import 'package:untitled1/consumption_table/consumption_table_page.dart';
+// Removido: 'package:ntp/ntp.dart'; // Não é mais necessário no app
 import 'package:untitled1/firebase_options.dart';
 import 'package:untitled1/main.dart';
-import 'package:ntp/ntp.dart'; // Importa o pacote NTP
 import 'package:untitled1/screens/power_chart/power_chart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // ADICIONAR NOVA IMPORTAÇÃO
@@ -38,35 +37,18 @@ class _HomePageState extends State<HomePage> {
   final DatabaseReference _dbRef = FirebaseDatabase.instance.ref('led_control');
   // Referência para o LED 2
   final DatabaseReference _dbRef2 = FirebaseDatabase.instance.ref('led_control2');
-  // Referência para o nó power_logs
+  // Referência para o nó power_logs (agora usado APENAS para leitura)
   final DatabaseReference _powerLogRef = FirebaseDatabase.instance.ref('power_logs');
   
-  // Função que usa NTP para obter tempo preciso
-  Future<DateTime> _getNtpTime() async {
-    try {
-      // Obtém o tempo preciso do servidor NTP
-      return await NTP.now();
-    } catch (e) {
-      debugPrint('Erro ao obter tempo NTP: $e. Usando tempo local.');
-      // Retorna o tempo local como fallback
-      return DateTime.now();
-    }
-  }
+  // -----------------------------------------------------------------
+  // FUNÇÃO _getNtpTime() REMOVIDA
+  // Não é mais necessária, pois o app não envia mais logs de tempo.
+  // -----------------------------------------------------------------
 
-  // Função para simular o log de dados de potência com tempo NTP
-  void _logPowerData(double powerValue) async {
-    final accurateTime = await _getNtpTime();
-    
-    // Envia o log para o Firebase
-    await _powerLogRef.push().set({
-      'timestamp': accurateTime.millisecondsSinceEpoch,
-      'value': powerValue,
-    }).then((_) {
-      debugPrint('Log de potência (${powerValue}W) enviado com sucesso.');
-    }).catchError((e) {
-      debugPrint('Erro ao logar potência: $e');
-    });
-  }
+  // -----------------------------------------------------------------
+  // FUNÇÃO _logPowerData() REMOVIDA
+  // Não é mais necessária. A placa ESP é a única fonte de logs.
+  // -----------------------------------------------------------------
 
   // Função para ligar/desligar o LED 1 (Original)
   void _setLedStatus(String status) async {
@@ -74,13 +56,10 @@ class _HomePageState extends State<HomePage> {
       await _dbRef.update({"Led_Status": status});
       debugPrint('Comando "$status" (LED 1) enviado com sucesso!'); // Identificação alterada
       
-      // Opcional: Chama a função de log de potência após ligar/desligar
-      // Simulamos um valor aleatório de potência quando liga/desliga
-      if (status == 'on') {
-        _logPowerData(150.0 + (50 * (DateTime.now().second % 5))); // Exemplo de valor simulado
-      } else {
-         _logPowerData(0.5); // Quase zero quando desligado
-      }
+      // -----------------------------------------------------------------
+      // BLOCO DE LOG DE POTÊNCIA REMOVIDO DAQUI
+      // A placa ESP fará a medição de mudança de consumo automaticamente.
+      // -----------------------------------------------------------------
 
     } catch (error) {
       debugPrint('ERRO ao enviar comando "$status" (LED 1): $error'); // Identificação alterada
@@ -279,19 +258,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 // FIM: NOVO CONTROLE
 
-                // Código para o botão "Logar Potência Manualmente" (COMENTADO conforme solicitado)
-                /*
-                const SizedBox(height: 30),
-                // Botão para simular um novo log (apenas para testes)
-                ElevatedButton.icon(
-                  onPressed: () {
-                     // Loga um valor simulado de potência aleatória
-                     _logPowerData(100.0 + (50 * (DateTime.now().minute % 5))); 
-                  }, 
-                  icon: const Icon(Icons.add_chart),
-                  label: const Text('Logar Potência Manualmente'),
-                ),
-                */
+                // O botão de log manual foi completamente removido.
   
                 // INÍCIO: CAMPO DE EXIBIÇÃO DA POTÊNCIA INSTANTÂNEA E CUSTO
                 const SizedBox(height: 40),
@@ -362,7 +329,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
+} //neste codigo a tensao gerada pelo botao liga/desliga nao é enviada deixando o app como leitor e controlador
 /*// ignore_for_file: file_names
 
 import 'package:firebase_database/firebase_database.dart';
